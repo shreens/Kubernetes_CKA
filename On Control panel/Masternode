@@ -1,0 +1,21 @@
+#After installing kubernetes and containerd
+-------------------------------------------------------------------------------------------------------------------------
+sudo kubeadm init --pod-network-cidr 192.168.0.0/16
+
+output after installing above command
+-------------------------------------------------------------------------------------------------------------------------
+--apiserver-advertise-address 
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+sudo kubeadm join 172.31.89.44:6443 --token 5ssif4.zbv5jq93trm8fqdx \
+        --discovery-token-ca-cert-hash sha256:ce0629296e066f7a1b8e3927d95d1b386d8435921b58b88339d14bd3ecffadf3
+        
+----------------------------------------------------------------------------------------------------------------------------
+Installing network plugins (calico drivers - To establish a communication between nodes and pods)
+
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/custom-resources.yaml
+-----------------------------------------------------------------------------------------------------------------------------
