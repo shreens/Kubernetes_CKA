@@ -1,7 +1,37 @@
 sudo kubectl get nodes  (display all master and worker nodes)
 kubectl get pods -A  (display the pod details)
 kubectl get pods -o wide (display the pod details with ip address)
+kubectl get pods --all-namespaces (To display all pods with all namespaces)
+kubectl get pods --show-labels (To display all pods with labels)
 kubectl run demopod --image=nginx  (to create a pod called demopod with nginx image)
 kubectl describe pods  (display the details of all pods)
 kubectl describe pod demopod (describe the particular pod called demopod)
 kubectl delete pod demopod (delete the particular demopod)
+kubectl port-forward demopod 5001:80 --address='0.0.0.0'(to access the demopod with 5001 port no extrenally in browser)
+kubectl logs demopod (To check the logs of particular pod)
+kubectl exec -it demopod sh (To login in to the pod)
+kubectl exec -it demopod -c cont1 sh (To login to the particular container in the pod)
+exit - to come out of the pod/container.
+kubectl run firstpod --image=nginx --namespace=demo-dev --dry-run=client -o yaml/json  > pod.yaml
+kubectl get namespaces
+kubectl create ns demo-dev
+kubectl get pods -n demo-dev (to display all pods with that namespace)
+kubectl create deploy anotherpod --image=nginx -n demo-dev (To create pod with particular namespace)
+kubectl config set-context --current --namespace=demo-dev
+kubectl label pods demopod type=awesome(Assigning label to the pod)
+kubectl label pods demopod type- (Unassigning label from the pod)
+kubectl get pods -l type=awsome
+kubectl get pods -l 'enviroment in (qa,prod)'
+kubectl delete pods demopod -l type=awsome
+kubectl get pods --selector=app=myapp
+kubectl get pods --feild-selector=status.phase=Running
+kubectl run demopod --image=nginx --dry-run=client -o yaml (Its just dry run to check syntax errors)
+kubectl run demopod --image=nginx -o yaml (Yaml file to create a pod)
+vi test.yaml
+kubectl apply -f test.yaml
+kubectl get svc (display all services)
+vi testsvc.yaml
+kubectl apply -f testsvc.yaml
+kubectl describe svc/my-service 
+kubectl port-forward svc/my-service 6000:80 --address='0.0.0.0'
+
