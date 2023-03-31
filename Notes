@@ -2,17 +2,27 @@ Kubernetes - Its a container Orchestration Tool only, to manage multiple contain
 
 Pod - Its the smallest unit in kubernetes runs a multiple containers.
 
-Kubelet - It initiates agent process and responsible to communicate with Master API process and responsible for running the pods.
+Kubelet - It initiates agent process and responsible to communicate with Master API server and responsible for running the pods.
 
 API server - gets the commands and responsible to do the requested task.
 
 kubectl - Its a client utility interacts with master API server.
 
-ETCD - Its a Database stores all the information regarding servers.
+ETCD - Its a Database stores all the information regarding cluster(servers).
 
-Kube Controller Manager - Manages (Current State = Desired State).
+Kube Controller Manager - Manages (Current State = Desired State) of pods.
 
 Kube Scheduler - Schedule a pod to run on particular node depending on the node capacity.
 
 Calico network plugins - To establish a communication between master and worker nodes.
+
+Namespaces - logical grouping of pods, isolation of resources in the kubernetes cluster.
+
+Resources - whatever we create on kubernetes cluster.
+
+Labels - For selecting particular pods in the same Namespaces.
+
+selectors - It tells the controller what pods to be controlled in the cluster.
+
+Services - Help us to access the applications running in a single/group of pods.It acts like a load balancer.
 
