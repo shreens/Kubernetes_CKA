@@ -1,0 +1,36 @@
+A QUESTION ON HOW TO UPDATE ETCD 
+
+STEP1:
+
+curl -s https://api.github.com/repos/etcd-io/etcd/releases/latest \
+  | grep browser_download_url \
+  | grep linux-amd64 \
+  | cut -d '"' -f 4 \
+  | wget -i -
+
+STEP2:
+tar xvf etcd-v*.tar.gz
+cd etcd-*/
+sudo mv etcd* /usr/local/bin/
+cd ..
+rm -rf etcd*
+
+Create a pod to see if backup worked
+
+STEP3: BACKUP
+sudo ETCDCTL_API=3 /usr/local/bin/etcdctl   --endpoints=https://127.0.0.1:2379   --cacert=/etc/kubernetes/pki/etcd/ca.crt   --cert=/etc/kubernetes/pki/etcd/server.crt   --key=/etc/kubernetes/pki/etcd/server.key   snapshot save /tmp/etcd.db
+
+HEALTH CHECK
+sudo /usr/local/bin/etcdctl endpoint health  --endpoints=https://127.0.0.1:2379   --cacert=/etc/kubernetes/pki/etcd/ca.crt   --cert=/etc/kubernetes/pki/etcd/server.crt   --key=/etc/kubernetes/pki/etcd/server.key
+
+LIST ALL KEYS
+sudo /usr/local/bin/etcdctl get / --prefix --keys-only  --endpoints=https://127.0.0.1:2379   --cacert=/etc/kubernetes/pki/etcd/ca.crt   --cert=/etc/kubernetes/pki/etcd/server.crt   --key=/etc/kubernetes/pki/etcd/server.key
+
+https://lzone.de/cheat-sheet/etcd
+
+
+
+ETCDCTL_API=3 /usr/local/bin/etcdctl snapshot restore /tmp/etcd.db --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key
+
+sudo vi /etc/kubernetes/manifests/etcd.yaml
+
