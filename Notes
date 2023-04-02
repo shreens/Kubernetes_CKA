@@ -22,7 +22,14 @@ Resources - whatever we create on kubernetes cluster.
 
 Labels - For selecting particular pods in the same Namespaces.
 
-selectors - It tells the controller what pods to be controlled in the cluster.
+selectors - It tells the controller what pods to be controlled in the cluster.(Services uses selectors to select the pods in cluster)
 
 Services - Help us to access the applications running in a single/group of pods.It acts like a load balancer.
 
+clusterIP - Its a internal load balancer.
+
+NodePort - External load balancer connecting to the NodePort to access the applications outside.
+
+Replicaset - To manage (Current state = Desired state) of pods, manages and create the pods based on labels but if there is any updates to the pods it wont get updated.
+
+Deployment - For rolling updates without downtime, contents get updated in the pods.
