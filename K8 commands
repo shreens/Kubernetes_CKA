@@ -164,8 +164,8 @@ kubectl apply -f deploy.yaml
 kubectl get deployments -o wide
 kubectl get pods -o wide
 kubectl scale deployment/frontend --replicas=3
-kubectl rolling history deployment/frontend
-kubectl rolling undo deployment/frontend --to-revision=4 (To rollback to the previous version)
+kubectl rollout history deployment/frontend
+kubectl rollout undo deployment/frontend --to-revision=4 (To rollback to the previous version)
 kubectl set image deployment subapp app=nginx:latest (To set new image to the deployment subapp)
 
 Deployment Yaml file
