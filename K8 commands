@@ -35,3 +35,176 @@ kubectl apply -f testsvc.yaml
 kubectl describe svc/my-service 
 kubectl port-forward svc/my-service 6000:80 --address='0.0.0.0'
 
+Service Yaml file for NodePort
+
+apiVersion: v1	
+kind: Service
+metadata:
+  name: np-service
+spec:
+  selector:
+      type: awesome
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9000
+      targetPort: 80
+  type: NodePort
+  
+  Service yaml file for clusterIP
+  
+  apiVersion: v1	
+kind: Service
+metadata:
+  name: np-service
+spec:
+  selector:
+      type: awesome
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9000
+      targetPort: 80
+      
+kubectl run demo1 --image=nginx
+kubectl run demo2 --image=nginx
+kubectl run demo3 --image=nginx
+kubectl label pod demo1 type=awesome
+kubectl label pod demo2 type=awesome
+kubectl label pod demo3 type=notawesome
+kubectl get pods -o wide --show-labels
+vi Svcnp.yaml
+kubectl apply -f Svcnp.yaml
+kubectl get svc -o wide
+(browser - vmip:portno ====> accessing application)
+kubectl expose pod demo3 --port 7070 --targetport 80 --type=NodePort --dry-run=client -o yaml (Creating service through command line)
+kubectl expose pod demo3 --port 7070 --targetport 80 --type=NodePort 
+
+Replicaset yaml file
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+vi replica.yaml
+kubectl apply -f replica.yaml
+kubectl get rs 
+kubectl get pods -o wide
+kubectl scale --replicas=5 rs/frontend
+kubectl delete rs frontend
+
+Deployment yaml file
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: demo
+  template:
+    metadata:
+      labels:
+        tier: demo
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: guestbook    =====================================================>These labels are for deployment frontend
+    tier: frontend    =====================================================>
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: demo       ====================================================> These selector labels are for selecting service
+  template:
+    metadata:
+      labels:
+        tier: demo    ======================================================> These labels for selecting pods
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+        
+vi deploy.yaml
+kubectl create -f deploy.yaml
+kubectl apply -f deploy.yaml
+kubectl get deployments -o wide
+kubectl get pods -o wide
+kubectl scale deployment/frontend --replicas=3
+kubectl rolling history deployment/frontend
+kubectl rolling undo deployment/frontend --to-revision=4 (To rollback to the previous version)
+kubectl set image deployment subapp app=nginx:latest (To set new image to the deployment subapp)
+
+Deployment Yaml file
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subapp
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: demo
+  template:
+    metadata:
+      labels:
+        tier: demo
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+---
+apiVersion: v1	
+kind: Service
+metadata:
+  name: np-service
+spec:
+  selector:
+      tier: demo
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9000
+      targetPort: 80
+  type: NodePort
+ ----
+ 
+ 
