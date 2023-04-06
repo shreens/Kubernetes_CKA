@@ -206,6 +206,54 @@ spec:
       port: 9000
       targetPort: 80
   type: NodePort
- ----
+ ---
+ =====================================================================================================================================================================
+ Example 2 ::
  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - image: mongo:5.0.15
+        name: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: adminuser
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: password123
+			  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo
+  name: mongo-nodeport-svc
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+    nodePort: 32000
+  selector:
+    app: mongo
+  type: NodePort
+ ---
+=====================================================================================================================================================================
+
+
+
  
