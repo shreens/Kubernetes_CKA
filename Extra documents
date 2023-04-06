@@ -34,3 +34,22 @@ ETCDCTL_API=3 /usr/local/bin/etcdctl snapshot restore /tmp/etcd.db --endpoints=h
 
 sudo vi /etc/kubernetes/manifests/etcd.yaml
 
+=======================================================================================================================================================================
+
+DOCKER IMAGES MODIFICATION
+
+sudo docker run -d -p 8080:80 nginx
+echo "<h1>CHANGED THE WELCOME PAGE... WELCOME TO KUBERNETES SESSION</h1>" > /usr/share/nginx/html
+docker commit c62c73eb139e modifiednginx
+
+sudo docker build -t react-native-app -f Docker/Dockerfile .
+sudo docker login -u "jitenreddy" -p "<Put password here>" docker.io
+sudo docker tag react-native-app jitenreddy/react-native-app
+sudo docker image push jitenreddy/react-native-app
+sudo docker run -p 8080:19006 -td jitenreddy/react-native-app
+
+sudo docker build -t expmon -f Docker/Dockerfile .
+sudo docker tag expmon jitenreddy/expmon
+sudo docker image push jitenreddy/expmon
+======================================================================================================================================================================
+
