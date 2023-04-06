@@ -47,8 +47,9 @@ spec:
   ports:
     - name: http
       protocol: TCP
-      port: 9000
-      targetPort: 80
+      port: 9000               ===============================>(port no to map the internal load balancer generated ip)
+      targetPort: 80           ================================>(application port no inside the container)
+      nodeport: 300081         =================================>(port no for accessing application in browser)
   type: NodePort
   
   Service yaml file for clusterIP
