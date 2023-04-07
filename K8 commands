@@ -459,7 +459,124 @@ kubectl apply -f sharedvolume.yaml
 kubectl get pods
 Login to the pod and particular containers data will be available since its stored at node level.
 =======================================================================================================================================================================
-asdfg
+PODS --acess--> PERSISTENT VOLUME CLAIM ----acess--------> PERSISTENT VOLUME
+
+vi pv.yaml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage            #type of storage
+  local:
+    path: /data/mongo                      #path of storage class (local-storage) on all worker nodes
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: NotIn
+          values:
+          - controlplane
+ ---
+ kubectl apply -f pv.yaml
+ kubectl get pv  (if status is bound then the volume is not available for others)
+=====================================================================================================================================================================
+vi pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: local-storage
+---
+kubectl apply -f pvc.yaml
+kubectl get pvc
+======================================================================================================================================================================
+on Worker Node::  (We have create a volume path)
+sudo mkdir data
+cd data/
+sudo mkdir mongo
+cd mongo/
+sudo chmod -R 777 /data/mongo
+
+vi mongo.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - image: mongo:5.0.15
+        name: mongo
+        args: ["--dbpath","/data/mongo"]
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: adminuser
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: password123
+        volumeMounts:
+        - name: "mongo-data-dir"
+          mountPath: "/data/mongo"
+      volumes:
+      - name: "mongo-data-dir"
+        persistentVolumeClaim:
+          claimName: "mongo-pvc"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo
+  name: mongo-nodeport-svc
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+    nodePort: 32000
+  selector:
+    app: mongo
+  type: NodePort
+---
+
+kubectl apply -f mongo.yaml
+kubectl get pods
+=====================================================================================================================================================================
+aasdf
+
+
+ 
+ 
+ 
+
 
 
 
