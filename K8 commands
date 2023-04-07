@@ -327,7 +327,8 @@ To convert IP into DNS name we need "busybox" image.
 
 kubectl apply -f https://k8s.io/examples/admin/dns/busybox.yaml
 kubectl exec -ti busybox -- nslookup mongo-nodeport-svc (Gives the service mongo-nodeport-svc clusterIP and DNS name)
-kubectl exec -ti busybox -- nslookup mongo-nodeport-svc
+kubectl run centostest --image=centos -it /bin/bash ============(create a pod and login to the pod/particular container)
+curl http://DNS name:portno
            or 
 kubectl apply -f busybox.yaml 
 vi busybox.yaml
@@ -350,6 +351,125 @@ spec:
 ---
 
 ===================================================================================================================================================================
+VOLUMES ::::::::::(external storage to the pods/containers)
+
+EXAMPLE 1:
+SHARE THE DATA BETWEEN THE CONTAINERS WITHIN THE SAME POD.
+
+vi volumesbasic.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-emptydir
+spec:
+  containers:
+  - name: alpine1
+    image: alpine
+    command: ["/bin/sleep", "999999"]
+    volumeMounts:
+    - mountPath: /alpine1
+      name: data
+  - name: alpine2
+    image: alpine
+    command: ["/bin/sleep", "999999"]
+    volumeMounts:
+    - mountPath: /alpine2
+      name: data
+  volumes:
+  - name: data
+    emptyDir: {}
+---
+
+kubectl apply -f volumebasic.yaml
+kubectl get pods
+kubectl exec -it shared-volume-emptydir -c alpine1 sh
+ls
+cd alpine1/
+touch testfile.txt
+exit
+kubectl exec -it shared-volume-emptydir -c alpine2 sh
+ls
+cd alpine2/
+ls
+cat testfile.txt
+echo "HELLO THERE" > testfile.txt
+exit
+kubectl exec -it shared-volume-emptydir -c alpine1 sh
+ls
+cd alpine1/
+cat testfile.txt
+
+IF POD GOES DOWN AND NEW POD IS CREATED DATA WILL NOT BE AVAILBLE.
+======================================================================================================================================================================
+EXAMPLE 2 ::: SAVES THE DATA AT NODE LEVEL (IF THE POD DIES AND NEW POD CREATED ON SAME WORKER NODE DATA WILL BE AVAILABLE).
+
+vi sharedvolume.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-hostpath
+spec:
+  containers:
+  - name: alpine1
+    image: alpine
+    command: ["/bin/sleep", "999999"]
+    volumeMounts:
+    - mountPath: /edureka1
+      name: data
+  - name: alpine2
+    image: alpine
+    command: ["/bin/sleep", "999999"]
+    volumeMounts:
+    - mountPath: /edureka2
+      name: data
+  volumes:
+  - name: data
+    hostPath:
+      path: /tmp/data
+---
+
+kubectl apply -f sharedvolume.yaml
+kubectl get pods
+
+On Worker node::
+cd /tmp/data/
+vi hello.txt
+hello champions
+:wq
+cat hello.txt
+
+go back where pod is created.
+kubectl get pods
+kubectl exec -it shared-volume-hostpath -c alpine1 sh
+ls
+cd edureka1/
+ls
+you can see hello.txt file with contents
+exit
+kubectl exec -it shared-volume-hostpath -c alpine2 sh
+ls
+cd edureka2/
+ls
+you can see hello.txt file with contents
+exit
+kubectl delete pod shared-volume-hostpath
+kubectl apply -f sharedvolume.yaml
+kubectl get pods
+Login to the pod and particular containers data will be available since its stored at node level.
+=======================================================================================================================================================================
+asdfg
+
+
+
+
+
+
+
+
+
+
 
 
          
