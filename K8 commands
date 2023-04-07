@@ -234,7 +234,6 @@ spec:
           value: adminuser
         - name: MONGO_INITDB_ROOT_PASSWORD
           value: password123
-			  
 ---
 apiVersion: v1
 kind: Service
@@ -253,7 +252,74 @@ spec:
   type: NodePort
  ---
 =====================================================================================================================================================================
+example 3 :::
 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subappdeployment
+  labels:
+    app: subapp
+    tier: frontend
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: subapp
+  template:
+    metadata:
+      labels:
+        tier: subapp
+    spec:
+      containers:
+      - name: subapp
+        image: jitenreddy/expmon
+        env:
+        - name: MONGO_USERNAME
+          value: "adminuser"
+        - name: MONGO_PASSWORD
+          value: "password123"
+        - name: MONGO_CLUSTER_URL
+          value: "10.102.99.204"
+        - name: MONGO_PORT
+          value: "27017"
+        - name: DB_NAME
+          value: "Subscribers"
+        - name: COLLECTION_NAME
+          value: "subs"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sub-app-svc
+  name: sub-app-svc
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 4000
+  selector:
+    tier: subapp
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo
+  name: mongo-nodeport-svc
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+    nodePort: 32000
+  selector:
+    app: mongo
+---
+=======================================================================================================================================================================
 
 
  
