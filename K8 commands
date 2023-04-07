@@ -281,7 +281,7 @@ spec:
         - name: MONGO_PASSWORD
           value: "password123"
         - name: MONGO_CLUSTER_URL
-          value: "10.102.99.204"
+          value: "10.102.99.204"          =================>(mongo db service clusterIP)
         - name: MONGO_PORT
           value: "27017"
         - name: DB_NAME
@@ -320,6 +320,38 @@ spec:
     app: mongo
 ---
 =======================================================================================================================================================================
+Example 4 :: whenever the mongodb service get killed and restarted clusterIP gets changed so we cant keep on updating everytime instead we use DNS name.
 
+To convert IP into DNS name we need "busybox" image.
+
+
+kubectl apply -f https://k8s.io/examples/admin/dns/busybox.yaml
+kubectl exec -ti busybox -- nslookup mongo-nodeport-svc (Gives the service mongo-nodeport-svc clusterIP and DNS name)
+kubectl exec -ti busybox -- nslookup mongo-nodeport-svc
+           or 
+kubectl apply -f busybox.yaml 
+vi busybox.yaml
+
+#create a pod with busybox image to convert IP to DNS 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.28
+    command:
+      - sleep
+      - "3600"
+    imagePullPolicy: IfNotPresent
+  restartPolicy: Always
+---
+
+===================================================================================================================================================================
+
+
+         
 
  
