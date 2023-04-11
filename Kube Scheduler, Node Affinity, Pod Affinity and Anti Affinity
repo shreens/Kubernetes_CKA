@@ -1,0 +1,135 @@
+Node Affinity :: POD Choosing to run on Which worker Node based on label and affinity prefered/required status.
+kubectl get nodes --show-labels
+kubectl label node 172.16.15.31.ec2.internal disktype=ssd
+Strategy Recreate :::::: All the pods will be deleted first then new pods will be created.
+
+Node Affinity YAML file (vi nodeAffinity.yaml)
+=================================================================================================================================================================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-preferred-demo
+spec:
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: disktype
+            operator: In
+            values:
+            - ssd
+  containers:
+  - name: nginx
+    image: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+spec:
+  selector:
+    matchLabels:
+      app: web-store
+  replicas: 3
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: web-store
+    spec:
+      affinity:
+       nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: disktype
+              operator: In
+              values:
+              - ssd
+      containers:
+      - name: web-app
+        image: nginx:1.16-alpine
+---
+=====================================================================================================================================================================
+kubectl apply -f nodeAffinity.yaml
+kubectl get pods -o wide
+kubectl get nodes --show-labels
+======================================================================================================================================================================
+POD Affinity and Antiaffinity::
+
+POD Affinity: Node deciding which pods to be scheduled on it based on pod labels.
+POD AntiAffinity: Node deciding which pods not to be scheduled on it based on pod labels.
+
+kubectl run demopod --image=nginx -l test=demo
+
+vi podAffinity.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+spec:
+  selector:
+    matchLabels:
+      app: web-store
+  replicas: 3
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: web-store
+    spec:
+      affinity:
+       podAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: test
+              operator: In
+              values:
+              - demo
+          topologykey: "kubernetes.io/hostname"    
+      containers:
+      - name: web-app
+        image: nginx:1.16-alpine
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+spec:
+  selector:
+    matchLabels:
+      app: web-store
+  replicas: 3
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: web-store
+    spec:
+      affinity:
+       podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: test
+              operator: In
+              values:
+              - demo
+          topologykey: "kubernetes.io/hostname"    
+      containers:
+      - name: web-app
+        image: nginx:1.16-alpine
+---
+kubectl apply -f podAffinity.yaml
+kubectl get pods -o wide
+pod affinity :: All pods will get deployed on the worker node where the pod with test=demo label is present.
+pod antiaffinity:: All the pods will not get deployed on the worker node wher the pod with test=demo label is present.
+======================================================================================================================================================================
+s
