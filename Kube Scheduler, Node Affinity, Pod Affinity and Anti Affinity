@@ -1,4 +1,4 @@
-Node Affinity :: POD Choosing to run on Which worker Node based on label and affinity prefered/required status.
+Node Affinity :: POD Choosing to run on Which worker Node based on node label and node affinity prefered/required status.
 kubectl get nodes --show-labels
 kubectl label node 172.16.15.31.ec2.internal disktype=ssd
 Strategy Recreate :::::: All the pods will be deleted first then new pods will be created.
