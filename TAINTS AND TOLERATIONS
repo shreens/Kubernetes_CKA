@@ -1,0 +1,40 @@
+Taints : Its like a restriction so the pods are not get scheduled in that node.
+Tolerations :: pods will get scheduled on particular node based on tolerations even if taint restriction applied on that node.
+
+kubectl get nodes -o json | jq '.items[].spec.taints'
+kubectl get nodes -o json | jq -r '.items[].spec.taints'
+kubectl taint nodes ip-172-31-29-58.ec2.internal something=bird:NoSchedule
+kubectl taint nodes ip-172-31-29-58.ec2.internal something=bird:NoSchedule-
+kubectl taint nodes ip-172-31-23-31.ec2.internal something=animal:NoExecute
+
+
+vi tolerations.yaml
+
+apiversion: v1
+kind: Pod
+metadata:
+  name: mongo
+spec:
+  tolerations:
+    - key: "something"
+      operator: "Equal"
+      value: "animal"
+      effect: "NoSchedule"
+  containers:
+      name: mongodb
+      image: mongo
+---
+apiversion: v1
+kind: Pod
+metadata:
+  name: mongo
+spec:
+  tolerations:
+    - key: "sometning"
+      operator: "Equal"
+      value: "bird"
+      effect: "NoExecute"
+  containers:
+      name: mongodb
+      image: mongo
+---
