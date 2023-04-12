@@ -1,5 +1,7 @@
 Taints : Its like a restriction so the pods are not get scheduled in that node.
 Tolerations :: pods will get scheduled on particular node based on tolerations even if taint restriction applied on that node.
+NoSchedule: It will not schedule any pods.
+NoExecute: Running pods will also gets terminated.
 
 kubectl get nodes -o json | jq '.items[].spec.taints'
 kubectl get nodes -o json | jq -r '.items[].spec.taints'
