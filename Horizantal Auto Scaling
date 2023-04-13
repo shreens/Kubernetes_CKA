@@ -1,0 +1,21 @@
+Horizantal Auto Scaling:
+
+          It will increase or reduce the pods automatically depending on the traffic load.
+          We need to download metric server.
+          
+wget https://k8s.io/examples/application/php-apache.yaml	
+
+wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+vi components.yaml
+--kubelet-insecure-tls
+
+
+kubectl autoscale deployment php-apache --cpu-percent=50 --min=1 --max=10
+Kubectl get hpa
+kubectl get hpa php-apache --watch
+
+kubectl run -i --tty load-generator --rm --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://php-apache; done"
+
+kubectl get hpa php-apache --watch
+          
