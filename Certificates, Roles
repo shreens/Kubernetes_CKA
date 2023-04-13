@@ -1,0 +1,30 @@
+control plane
+vi ~/.kube/config ========>file
+
+CERTIFICATES::
+openssl genrsa -out jiten.key 2048      ===============>Creating a key called jiten #cat jiten.key
+openssl req -new -key jiten.key -out jiten.csr -subj "/CN=jiten"  =====================>Certificate Request
+sudo openssl x509 -req -in jiten.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out jiten.crt -days 500 ======>sign up cert
+
+ls jiten.*
+vi jiten.csr
+vi jiten.crt   ===========> valid for 500 days.
+
+vi .kube/config  ======>to check the users and context
+
+Creating User credentials  jiten in kubernetes cluster and switching to the particular context ::
+
+kubectl config set-credentials jiten --client-certificate=jiten.crt --client-key=jiten.key
+kubectl config set-context someuser-context --cluster=kubernetes --user=jiten
+kubectl config use-context someuser-context
+
+Assigning Role :
+kubectl config get-contexts
+kubectl config use-context kubernetes-admin@kubernetes
+kubectl create role developer --verb=create --verb=get --verb=list --verb=update --verb=delete --resource=pods
+kubectl create rolebinding developer-binding-demo --role=developer --user=jiten
+
+https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubeconfig-additional-users
+
+
+kubectl get pods --insecure-skip-tls-verify=true
