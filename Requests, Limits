@@ -1,0 +1,26 @@
+Requests:  Minimum Requirement
+Limits:  Maximum Available
+
+2 core CPU --- "2000m"
+
+vi reqlim.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: memory-demo
+    image: nginx
+    resources:
+      requests:
+        memory: "7Gi"  # It specifies the minimum requirment
+        cpu: "2000m"
+      limits:
+        memory: "7Gi"  #It specifies the maximum available requirement
+
+kubectl apply -f reqlim.yaml
+kubectl get pods -o wide
+kubectl describe pod nginx
+
