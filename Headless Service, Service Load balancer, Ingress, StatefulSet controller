@@ -61,7 +61,25 @@ aws eks update-kubeconfig --region us-east-1 --name EKSDemoCluster  ============
 (browser ::: external load balancer ip of service:port no  =============>for accessing application)
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Ingress
+Ingress  ::
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.7.0/deploy/static/provider/cloud/deploy.yaml
+
+kubectl create deployment demo --image=httpd --port=80
+kubectl expose deployment demo
+
+kubectl create ingress demo-localhost --class=nginx --rule="demo.localdev.me/*=demo:80" --dry-run=client -o yaml
+kubectl create ingress demo-localhost --class=nginx --rule="demo.localdev.me/*=demo:80"
+
+kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 8080:80
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+StatefulSet::
+
+Assigns the numbers to the pods.(Instead some text)
+Even if the pod deletes pod gets created on same worker node.
+
+Kind: StatefulSet (Instead of deployment)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
